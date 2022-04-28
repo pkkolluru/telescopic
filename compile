@@ -1,0 +1,1 @@
+g++ -O3 -I ./src/ telescopic.cpp ./src/functions.cpp ./src/telescopicProjective.cpp -o telescopic.out
