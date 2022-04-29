@@ -37,7 +37,7 @@
 
 #include"src/parameters.hpp"
 #include"src/functions.hpp"
-#include"src/projectiveOrder2.hpp"
+#include"src/telescopicProjective.hpp"
 
 int main() {
   myReal initvalue[SIZE] = {0.0};
@@ -64,20 +64,12 @@ int main() {
  const myReal finalTime =  odeFunction.finalTime;
 
   odeFunction.initialConditions(initvalue);
-  printToFile(0, t, initvalue, yExact, file);
-
-//   std::cout << "Euler:              " << odeFunction.m  << "\n";
-//   std::cout << "projSteps:          " << odeFunction.k  << "\n";
-//   std::cout << "Integrator:         " << odeFunction.m1 << "\n";
-//   std::cout << "Proj integrator:    " << odeFunction.k1 << "\n";
+  printToFile(0, t, initvalue, file);
   std::cout << "dt:                 " << odeFunction.dt << "\n";
 
   for (int i = 0; i < odeFunction.numberOfProjectiveLevels; i++) {
     std::cout << "DTLevel[" << i << "]: " << odeFunction.DTLevel[i] << "\n";
  }
-
-  //   std::cout << "proj_5 Jump:        " << odeFunction.DT4*odeFunction.k4 << "\n";
-  //   std::cout << "lambdaDt:           " << odeFunction.lambdaDt << "\n \n \n";
 
   copyFirstArrayToSecond(initvalue, yOld);
 
@@ -85,42 +77,19 @@ int main() {
   auto WallStartTime = std::chrono::high_resolution_clock::now();
 
 
-//   for (int step = 1; ; step++) {
-//     primaryIntegrator<fourthOrderIntegrator>(yOld, yPrimary, odeFunction,
-//                                             odeFunction.m3, t);
-//     projectiveIntegrator<fourthOrderIntegrator>(yPrimary, yProj, odeFunction, t,
-//                                                 odeFunction.DT3, odeFunction.k3);
-// //     primaryIntegrator<thirdOrderIntegrator>(yOld, yPrimary, odeFunction,
-// //                                             odeFunction.m2, t);
-// //     projectiveIntegrator<thirdOrderIntegrator>(yPrimary, yProj, odeFunction, t,
-// //                                                 odeFunction.DT2, odeFunction.k2);
-// //     primaryIntegrator<secondOrderIntegrator>(yOld, yPrimary, odeFunction,
-// //                                             odeFunction.m1, t);
-// //     projectiveIntegrator<secondOrderIntegrator>(yPrimary, yProj, odeFunction, t,
-// //                                                 odeFunction.DT, odeFunction.k1);
-// 
-// //      BDF<eulerIntegrator>(yOld, yNew, odeFunction, t, odeFunction.dt, odeFunction.k);
-// 
-// //      BDF<secondOrderIntegrator>(yOld, yNew, odeFunction, t, odeFunction.dt, odeFunction.k);
-// 
-// //      BDF<thirdOrderIntegrator>(yOld, yNew, odeFunction, t, odeFunction.DT2, odeFunction.m2, odeFunction.k2);
-// 
-// //      BDF<fourthOrderIntegrator>(yOld, yNew, odeFunction, t, odeFunction.DT3, odeFunction.m3, odeFunction.k3);
-//     
-//      copyFirstArrayToSecond(yProj, yOld);
-// 
-// 
-//     if (step%printFreq == 0) {
-// //       exactSolution(yOld, yExact, odeFunction, t);
-//       printToFile(step, t, yProj, yExact, file);
-//     }
-// 
-//     if (t > finalTime)
-//       break;
-//   }
-// 
-//   for (int elem = 0; elem < SIZE; elem++)
-//     std::cout << yProj[elem] <<  std::endl;
+   for (int step = 1; ; step++) {
+     projective(yOld, yProj, odeFunction, odeFunction.dt, t, odeFunction.numberOfProjectiveLevels-1,file);
+     copyFirstArrayToSecond(yProj, yOld);
+     if (step%printFreq == 0) {
+       printToFile(step, t, yProj, file);
+       std::cout << step << "  " << t << std::endl;
+     }
+     if (t > finalTime)
+       break;
+   }
+
+   for (int elem = 0; elem < SIZE; elem++)
+     std::cout << yProj[elem] <<  std::endl;
 
   auto CpuEndTime = std::clock();
   auto WallEndTime = std::chrono::high_resolution_clock::now();

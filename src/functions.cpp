@@ -38,9 +38,8 @@ void eulerIntegrator(myReal *yOld, myReal *yNew, funct odeFUN, myReal &t) {
   for (int elem = 0; elem < SIZE; elem++) {
     yNew[elem] = yOld[elem] + odeFUN.dt*f[elem];
   }
-  t = t + odeFUN.dt;
+//  t = t + odeFUN.dt;
 }
-
 
 void forwardEuler(myReal *yOld, myReal *yNew, funct odeFUN, int m, myReal dt,
                   myReal t) {
@@ -101,82 +100,15 @@ void projectiveEulerImplicit(myReal *yOld, myReal *yProj, funct odeFUN,
   }
 }
 
-void projectiveEulerSecondDerivatives(myReal *yOld, myReal *yProj, funct odeFUN,
-                                      int k, myReal dt, myReal t) {
-  myReal yTemp1[SIZE] = {0.0};
-  myReal yTemp2[SIZE] = {0.0};
-  myReal gradient1[SIZE] = {0.0};
-  myReal gradient2[SIZE] = {0.0};
-  myReal yImplicit1[SIZE] = {0.0};
-  myReal yImplicit2[SIZE] = {0.0};
-  myReal gradientOfGradient[SIZE] = {0.0};
-
-  forwardEuler(yOld, yTemp1, odeFUN, 1, dt, t);
-  implicitScheme(yOld, yTemp1, yImplicit1, odeFUN, dt, t);
-  for (int elem = 0; elem < SIZE; elem++) {
-    gradient1[elem] = yImplicit1[elem] - yOld[elem];
-  }
-
-  forwardEuler(yImplicit1, yTemp2, odeFUN, 1, dt, t+dt);
-  implicitScheme(yImplicit1, yTemp2, yImplicit2, odeFUN, dt,  t+dt);
-  for (int elem = 0; elem < SIZE; elem++) {
-    gradient2[elem] = yImplicit2[elem] - yImplicit1[elem];
-  }
-
-  for (int elem = 0; elem < SIZE; elem++) {
-    gradientOfGradient[elem] = gradient2[elem] - gradient1[elem];
-  }
-
-  for (int elem = 0; elem < SIZE; elem++) {
-    yProj[elem] =  yOld[elem] + k*gradient1[elem]
-    + 0.5*k*k*dt*gradientOfGradient[elem];
-  }
-}
-
-myReal getTheDominantEigenValue(myReal *ymn, funct odeFUN, myReal dt, myReal t){
-  myReal ymn1[SIZE] = {0.0};
-  myReal ymn2[SIZE] = {0.0};
-  myReal gradient[SIZE] = {0.0};
-  myReal gradient2[SIZE] = {0.0};
-  myReal secondDer[SIZE] = {0.0};
-  myReal eps = 1e-12;
-
-  forwardEuler(ymn, ymn1, odeFUN, 1, dt, t+dt);
-  forwardEuler(ymn1, ymn2, odeFUN, 1, dt, t+2*dt);
-
-  for (int elem = 0; elem < SIZE; elem++) {
-    gradient[elem] = ymn1[elem] - ymn[elem];
-    gradient2[elem] = ymn2[elem] - ymn1[elem];
-    secondDer[elem] = gradient2[elem] - gradient[elem];
-  }
-
-  myReal val1 = eps;
-  for (int elem = 0; elem < SIZE; elem++) {
-    val1 += secondDer[elem]*gradient[elem];
-  }
-
-  myReal val2 = eps;
-  for (int elem = 0; elem < SIZE; elem++) {
-    val2 +=  gradient[elem]*gradient[elem];
-  }
-
-  if (std::fabs(val1 - eps) < eps)
-    val1 = 0.0;
-
-  return (val1/val2)/dt;
-}
-
 void copyFirstArrayToSecond(myReal *arr1, myReal *arr2) {
   for (int elem = 0; elem < SIZE; elem++)
     arr2[elem] = arr1[elem];
 }
 
-void printToFile(int step, myReal timeLocal, myReal *y, myReal *yExact,
+void printToFile(int step, myReal timeLocal, myReal *y,
                  std::ofstream &file) {
   file << step << std::setw(24) << timeLocal << std::setw(24);
   for (int elem = 0; elem < SIZE; elem++)
     file << y[elem] <<  std::setw(24);
-  //   for(int elem = 0; elem < SIZE; elem++)
-  //     file << yExact[elem] <<  std::setw(24);
   file << std::endl;
 }

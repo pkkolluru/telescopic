@@ -48,20 +48,17 @@ enum cmp {CH4,    O2,   CH3,    HO2, CH3O,
           CO2,   H2O,  CHO};
 
 struct funct{
-  myReal finalTime = 1e-4;
-  myReal dt  = 1.e-15;
+  myReal finalTime = 200.0;
+  myReal dt  = 1.e-14;
 
   const static int numberOfProjectiveLevels = 6;
-  int mLevels[numberOfProjectiveLevels];
-  int kLevels[numberOfProjectiveLevels];
+  int mLevels[numberOfProjectiveLevels] = {30, 30, 30, 30, 30, 30};// 30};
+  int kLevels[numberOfProjectiveLevels] = {40, 40, 40, 40, 40, 40};//, 200};
   myReal DTLevel[numberOfProjectiveLevels];
 
 
   void setParams(){
     for (int i = 0; i < numberOfProjectiveLevels; i++) {
-      funct::mLevels[i] = 30;
-      funct::kLevels[i] = 80;
-
       if(i==0)
         funct::DTLevel[i] = (funct::mLevels[i]+funct::kLevels[i])*dt;
       else
@@ -282,6 +279,7 @@ struct funct{
 
     f[cmp::CH2O] = + k[2]*y[cmp::O2]*y[cmp::CH3]
                    - k[4]*y[cmp::CH3]*y[cmp::CH2O]
+                   + k[11]*y[cmp::CH3O2]*y[cmp::CH3O2]
                    + k[15]*y[cmp::CH3O]*y[cmp::CH3O2]
                    + k[16]*y[cmp::CH3O2]
                    - k[19]*y[cmp::CH3O]*y[cmp::CH2O]
@@ -492,11 +490,12 @@ struct funct{
   }
 
   void initialConditions(myReal *y) {
-    y[cmp::CH4] = 1.0 ;
-    y[cmp::O2] = 2.0 ;
-    for (int index = 2; index<SIZE; index++) {
+    myReal NA = 6.02214076e23;
+    for (int index = 0; index<SIZE; index++) {
       y[index] = 0.0;
     }
+    y[cmp::CH4] = 1.38270e-3;// * NA;
+    y[cmp::O2] = 2.0*1.38270e-3;// * NA;
   }
 };
 

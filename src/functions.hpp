@@ -44,7 +44,7 @@
 void eulerIntegrator(myReal *yOld, myReal *yNew, funct odeFUN, myReal &t);
 
 void copyFirstArrayToSecond(myReal *arr1, myReal *arr2);
-void printToFile(int step, myReal timeLocal, myReal *y, myReal *yExact,
+void printToFile(int step, myReal timeLocal, myReal *y,
                  std::ofstream &file);
 void forwardEuler(myReal *yOld, myReal *yNew, funct odeFUN, int m, myReal dt,
                   myReal t);
@@ -52,10 +52,4 @@ void projectiveEuler(myReal *yOld, myReal *yProj, funct odeFUN, int k,
                      myReal dt, myReal t);
 void implicitScheme(myReal *yN, myReal *yNPlus1, myReal *yNew,
                     funct odeFUN, myReal dt, myReal t);
-void projectiveEulerImplicit(myReal *yOld, myReal *yProj, funct odeFUN,
-                             int k, myReal dt, myReal t);
-void projectiveEulerSecondDerivatives(myReal *yOld, myReal *yProj, funct odeFUN,
-                                      int k, myReal dt, myReal t);
-myReal getTheDominantEigenValue(myReal *ymn, funct odeFUN, myReal dt, myReal t);
-
 #endif
